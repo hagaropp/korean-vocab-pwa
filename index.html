@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>한국어 Vocab — Korean Flashcards</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#4F46E5" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="한국어 Vocab" />
+  <link rel="apple-touch-icon" href="icon-180.png" />
+  <link rel="icon" href="icon-192.png" />
+
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #ffffff;
+      --bg-elevated: #F0F0F3;
+      --bg-selected: #E0E1E6;
+      --text: #000000;
+      --text2: #60646C;
+      --accent: #4F46E5;
+      --green: #34C759;
+      --green-tint: #34C75930;
+      --red: #FF3B30;
+      --red-tint: #FF3B3030;
+      --safe-top: env(safe-area-inset-top);
+      --safe-bot: env(safe-area-inset-bottom);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #000000;
+        --bg-elevated: #212225;
+        --bg-selected: #2E3135;
+        --text: #ffffff;
+        --text2: #B0B4BA;
+        --accent: #818CF8;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overscroll-behavior: none;
+      -webkit-text-size-adjust: 100%;
+    }
+    button { font: inherit; color: inherit; touch-action: manipulation; cursor: pointer; }
+
+    #root { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
+
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: calc(20px + var(--safe-top)) 20px calc(96px + var(--safe-bot));
+      max-width: 640px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    h1.page-title { font-size: 40px; font-weight: 800; line-height: 1.1; margin-bottom: 4px; }
+    p.page-subtitle { color: var(--text2); font-size: 15px; margin-bottom: 20px; }
+
+    .lesson-list { display: flex; flex-direction: column; gap: 8px; }
+    .lesson-row {
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--bg-elevated); border-radius: 16px; padding: 16px;
+      border: none; text-align: left; width: 100%;
+    }
+    .lesson-row .lesson-title { font-size: 16px; font-weight: 500; }
+    .lesson-row .lesson-count { font-size: 14px; color: var(--text2); }
+
+    .back-link { color: var(--text2); font-size: 14px; background: none; border: none; padding: 4px 0; margin-bottom: 12px; }
+    .row-between { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .progress-label { font-size: 14px; color: var(--text2); }
+
+    /* Flashcard */
+    .card-scene { perspective: 1200px; height: 320px; margin-bottom: 16px; }
+    .card-flip {
+      position: relative; width: 100%; height: 100%;
+      transform-style: preserve-3d; transition: transform 0.35s ease;
+    }
+    .card-flip.flipped { transform: rotateY(180deg); }
+    .card-face {
+      position: absolute; inset: 0; backface-visibility: hidden;
+      background: var(--bg-elevated); border-radius: 24px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 8px; padding: 20px; text-align: center;
+    }
+    .card-back-face { transform: rotateY(180deg); }
+    .card-korean { font-size: 40px; font-weight: 700; }
+    .card-romanization { font-size: 16px; color: var(--text2); }
+    .card-english { font-size: 28px; font-weight: 700; }
+    .card-hint { text-align: center; color: var(--text2); font-size: 14px; margin-bottom: 16px; }
+
+    .action-row { display: flex; gap: 12px; }
+    .btn { border: none; border-radius: 16px; padding: 16px; font-size: 16px; font-weight: 600; flex: 1; text-align: center; }
+    .btn-red { background: var(--red); color: #fff; }
+    .btn-green { background: var(--green); color: #fff; }
+    .btn-dark { background: var(--text); color: var(--bg); }
+    .btn-block { width: 100%; margin-top: 16px; }
+
+    .center-text { text-align: center; }
+    .result-title { font-size: 32px; font-weight: 800; margin-bottom: 8px; }
+    .result-body { font-size: 16px; color: var(--text2); margin-bottom: 24px; }
+    .result-back { text-align: center; margin-top: 16px; color: var(--text2); background: none; border: none; font-size: 15px; }
+
+    /* Quiz */
+    .quiz-prompt {
+      background: var(--bg-elevated); border-radius: 24px; padding: 40px 20px;
+      display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 16px;
+    }
+    .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+    .quiz-option {
+      background: var(--bg-elevated); border: none; border-radius: 16px; padding: 16px;
+      text-align: left; font-size: 16px;
+    }
+    .quiz-option.correct { background: var(--green); color: #fff; }
+    .quiz-option.wrong { background: var(--red); color: #fff; }
+
+    /* Games menu */
+    .game-card { background: var(--bg-elevated); border: none; border-radius: 24px; padding: 24px; text-align: left; width: 100%; margin-top: 8px; }
+    .game-card-title { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+    .game-card-sub { color: var(--text2); font-size: 14px; }
+
+    /* Match */
+    .match-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+    .match-tile {
+      width: calc((100% - 16px) / 3); aspect-ratio: 1.1;
+      background: var(--bg-elevated); border: none; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center; text-align: center;
+      padding: 6px; font-size: 14px;
+    }
+    .match-tile.selected { background: var(--bg-selected); }
+    .match-tile.matched { background: var(--green-tint); }
+    .match-tile.wrong { background: var(--red-tint); }
+    .match-tile:disabled { opacity: 1; }
+
+    /* Tab bar */
+    .tab-bar-wrap {
+      position: fixed; left: 0; right: 0; bottom: 0;
+      display: flex; justify-content: center;
+      padding: 12px 16px calc(12px + var(--safe-bot));
+      pointer-events: none;
+    }
+    .tab-bar {
+      pointer-events: auto;
+      background: var(--bg-elevated); border-radius: 999px;
+      padding: 8px 20px; display: flex; align-items: center; gap: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      max-width: 640px; width: 100%;
+    }
+    .tab-brand { font-weight: 700; font-size: 14px; margin-right: auto; }
+    .tab-btn { background: transparent; border: none; padding: 6px 14px; border-radius: 12px; font-size: 14px; color: var(--text2); }
+    .tab-btn.active { background: var(--bg-selected); color: var(--text); }
+
+    .loading { display: flex; align-items: center; justify-content: center; height: 100%; color: var(--text2); }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useMemo } = React;
+
+    function shuffle(items) {
+      const result = [...items];
+      for (let i = result.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [result[i], result[j]] = [result[j], result[i]];
+      }
+      return result;
+    }
+
+    function LessonList({ lessons, onSelect }) {
+      return (
+        <div className="lesson-list">
+          {lessons.map((lesson) => (
+            <button key={lesson.id} className="lesson-row" onClick={() => onSelect(lesson)}>
+              <span className="lesson-title">{lesson.title}</span>
+              <span className="lesson-count">{lesson.words.length} words</span>
+            </button>
+          ))}
+        </div>
+      );
+    }
+
+    function FlashcardDeck({ lesson, onExit }) {
+      const [order, setOrder] = useState(() => shuffle(lesson.words.map((_, i) => i)));
+      const [index, setIndex] = useState(0);
+      const [flipped, setFlipped] = useState(false);
+      const [knownCount, setKnownCount] = useState(0);
+
+      const isDone = index >= order.length;
+      const word = !isDone ? lesson.words[order[index]] : null;
+
+      function advance(known) {
+        if (known) setKnownCount((c) => c + 1);
+        setFlipped(false);
+        setIndex((i) => i + 1);
+      }
+
+      function restart() {
+        setOrder(shuffle(lesson.words.map((_, i) => i)));
+        setIndex(0);
+        setKnownCount(0);
+        setFlipped(false);
+      }
+
+      if (isDone) {
+        return (
+          <div>
+            <div className="center-text">
+              <div className="result-title">Nice work!</div>
+              <div className="result-body">You knew {knownCount} of {order.length} words in {lesson.title}.</div>
+            </div>
+            <button className="btn btn-dark btn-block" onClick={restart}>Study again</button>
+            <button className="result-back" onClick={onExit}>Back to lessons</button>
+          </div>
+        );
+      }
+
+      return (
+        <div>
+          <div className="row-between">
+            <button className="back-link" onClick={onExit}>‹ Lessons</button>
+            <span className="progress-label">{index + 1} / {order.length}</span>
+          </div>
+
+          <div className="card-scene" onClick={() => setFlipped((f) => !f)}>
+            <div className={"card-flip" + (flipped ? " flipped" : "")}>
+              <div className="card-face">
+                <div className="card-korean">{word.korean}</div>
+                <div className="card-romanization">{word.romanization}</div>
+              </div>
+              <div className="card-face card-back-face">
+                <div className="card-english">{word.english}</div>
+              </div>
+            </div>
+          </div>
+          <div className="card-hint">Tap the card to flip</div>
+
+          <div className="action-row">
+            <button className="btn btn-red" onClick={() => advance(false)}>Still learning</button>
+            <button className="btn btn-green" onClick={() => advance(true)}>Got it</button>
+          </div>
+        </div>
+      );
+    }
+
+    function buildQuizQuestions(lesson, allWords) {
+      const count = Math.min(10, lesson.words.length);
+      const questionWords = shuffle(lesson.words).slice(0, count);
+      return questionWords.map((word) => {
+        const distractors = shuffle(allWords.filter((w) => w.english !== word.english)).slice(0, 3);
+        const options = shuffle([word, ...distractors]);
+        return { word, options };
+      });
+    }
+
+    function QuizGame({ lesson, allWords, onExit }) {
+      const [questions, setQuestions] = useState(() => buildQuizQuestions(lesson, allWords));
+      const [index, setIndex] = useState(0);
+      const [score, setScore] = useState(0);
+      const [picked, setPicked] = useState(null);
+
+      const isDone = index >= questions.length;
+      const current = !isDone ? questions[index] : null;
+
+      function choose(option) {
+        if (picked) return;
+        setPicked(option.english);
+        if (option.english === current.word.english) setScore((s) => s + 1);
+      }
+
+      function next() {
+        setPicked(null);
+        setIndex((i) => i + 1);
+      }
+
+      function restart() {
+        setQuestions(buildQuizQuestions(lesson, allWords));
+        setIndex(0);
+        setScore(0);
+        setPicked(null);
+      }
+
+      if (isDone) {
+        return (
+          <div>
+            <div className="center-text">
+              <div className="result-title">Quiz complete!</div>
+              <div className="result-body">You scored {score} / {questions.length} on {lesson.title}.</div>
+            </div>
+            <button className="btn btn-dark btn-block" onClick={restart}>Play again</button>
+            <button className="result-back" onClick={onExit}>Back to games</button>
+          </div>
+        );
+      }
+
+      return (
+        <div>
+          <div className="row-between">
+            <button className="back-link" onClick={onExit}>‹ Games</button>
+            <span className="progress-label">{index + 1} / {questions.length}</span>
+          </div>
+
+          <div className="quiz-prompt">
+            <div className="card-korean">{current.word.korean}</div>
+            <div className="card-romanization">{current.word.romanization}</div>
+          </div>
+
+          <div className="quiz-options">
+            {current.options.map((option) => {
+              const isCorrect = option.english === current.word.english;
+              const isPicked = picked === option.english;
+              const showResult = picked !== null;
+              let cls = "quiz-option";
+              if (showResult && isCorrect) cls += " correct";
+              else if (showResult && isPicked) cls += " wrong";
+              return (
+                <button key={option.english} className={cls} disabled={showResult} onClick={() => choose(option)}>
+                  {option.english}
+                </button>
+              );
+            })}
+          </div>
+
+          {picked && <button className="btn btn-dark btn-block" onClick={next}>Next</button>}
+        </div>
+      );
+    }
+
+    const MAX_PAIRS = 8;
+
+    function buildTiles(lesson) {
+      const words = shuffle(lesson.words).slice(0, Math.min(MAX_PAIRS, lesson.words.length));
+      const tiles = words.flatMap((word, pairId) => [
+        { key: pairId + "-ko", pairId, text: word.korean, type: "ko" },
+        { key: pairId + "-en", pairId, text: word.english, type: "en" },
+      ]);
+      return shuffle(tiles);
+    }
+
+    function MatchGame({ lesson, onExit }) {
+      const [tiles, setTiles] = useState(() => buildTiles(lesson));
+      const [selected, setSelected] = useState([]);
+      const [wrongPair, setWrongPair] = useState([]);
+      const [matchedPairIds, setMatchedPairIds] = useState(() => new Set());
+      const [moves, setMoves] = useState(0);
+
+      const pairCount = tiles.length / 2;
+      const isDone = matchedPairIds.size === pairCount;
+
+      function restart() {
+        setTiles(buildTiles(lesson));
+        setSelected([]);
+        setWrongPair([]);
+        setMatchedPairIds(new Set());
+        setMoves(0);
+      }
+
+      function tapTile(i) {
+        if (selected.length === 2) return;
+        if (selected.includes(i)) return;
+        if (matchedPairIds.has(tiles[i].pairId)) return;
+
+        const next = [...selected, i];
+        setSelected(next);
+
+        if (next.length === 2) {
+          const [a, b] = next;
+          setMoves((m) => m + 1);
+          if (tiles[a].pairId === tiles[b].pairId) {
+            setMatchedPairIds((prev) => new Set(prev).add(tiles[a].pairId));
+            setSelected([]);
+          } else {
+            setWrongPair(next);
+            setTimeout(() => {
+              setSelected([]);
+              setWrongPair([]);
+            }, 500);
+          }
+        }
+      }
+
+      if (isDone) {
+        return (
+          <div>
+            <div className="center-text">
+              <div className="result-title">All matched!</div>
+              <div className="result-body">You finished {lesson.title} in {moves} moves.</div>
+            </div>
+            <button className="btn btn-dark btn-block" onClick={restart}>Play again</button>
+            <button className="result-back" onClick={onExit}>Back to games</button>
+          </div>
+        );
+      }
+
+      return (
+        <div>
+          <div className="row-between">
+            <button className="back-link" onClick={onExit}>‹ Games</button>
+            <span className="progress-label">{moves} moves</span>
+          </div>
+
+          <div className="match-grid">
+            {tiles.map((tile, i) => {
+              const isMatched = matchedPairIds.has(tile.pairId);
+              const isSelected = selected.includes(i);
+              const isWrong = wrongPair.includes(i);
+              let cls = "match-tile";
+              if (isMatched) cls += " matched";
+              else if (isWrong) cls += " wrong";
+              else if (isSelected) cls += " selected";
+              return (
+                <button key={tile.key} className={cls} disabled={isMatched} onClick={() => tapTile(i)}>
+                  {tile.text}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    function LearnScreen({ lessons }) {
+      const [activeLesson, setActiveLesson] = useState(null);
+      if (activeLesson) {
+        return <FlashcardDeck lesson={activeLesson} onExit={() => setActiveLesson(null)} />;
+      }
+      return (
+        <div>
+          <h1 className="page-title">Learn</h1>
+          <p className="page-subtitle">Pick a lesson to start flashcards</p>
+          <LessonList lessons={lessons} onSelect={setActiveLesson} />
+        </div>
+      );
+    }
+
+    function GamesScreen({ lessons, allWords }) {
+      const [lesson, setLesson] = useState(null);
+      const [gameType, setGameType] = useState(null);
+
+      if (lesson && gameType === "quiz") {
+        return <QuizGame lesson={lesson} allWords={allWords} onExit={() => setGameType(null)} />;
+      }
+      if (lesson && gameType === "match") {
+        return <MatchGame lesson={lesson} onExit={() => setGameType(null)} />;
+      }
+      if (lesson) {
+        return (
+          <div>
+            <button className="back-link" onClick={() => setLesson(null)}>‹ Lessons</button>
+            <h1 className="page-title">{lesson.title}</h1>
+            <p className="page-subtitle">Choose a game</p>
+            <button className="game-card" onClick={() => setGameType("quiz")}>
+              <div className="game-card-title">Quiz</div>
+              <div className="game-card-sub">Multiple choice — pick the right meaning</div>
+            </button>
+            <button className="game-card" onClick={() => setGameType("match")}>
+              <div className="game-card-title">Match</div>
+              <div className="game-card-sub">Tap pairs of Korean and English</div>
+            </button>
+          </div>
+        );
+      }
+      return (
+        <div>
+          <h1 className="page-title">Games</h1>
+          <p className="page-subtitle">Pick a lesson to play</p>
+          <LessonList lessons={lessons} onSelect={setLesson} />
+        </div>
+      );
+    }
+
+    function App() {
+      const [vocab, setVocab] = useState(null);
+      const [tab, setTab] = useState("learn");
+
+      useEffect(() => {
+        fetch("vocabulary.json").then((r) => r.json()).then(setVocab);
+      }, []);
+
+      const allWords = useMemo(() => (vocab ? vocab.lessons.flatMap((l) => l.words) : []), [vocab]);
+
+      if (!vocab) {
+        return <div className="loading">Loading…</div>;
+      }
+
+      return (
+        <React.Fragment>
+          <div className="main">
+            {tab === "learn" ? (
+              <LearnScreen lessons={vocab.lessons} />
+            ) : (
+              <GamesScreen lessons={vocab.lessons} allWords={allWords} />
+            )}
+          </div>
+          <div className="tab-bar-wrap">
+            <div className="tab-bar">
+              <span className="tab-brand">한국어 Vocab</span>
+              <button className={"tab-btn" + (tab === "learn" ? " active" : "")} onClick={() => setTab("learn")}>Learn</button>
+              <button className={"tab-btn" + (tab === "games" ? " active" : "")} onClick={() => setTab("games")}>Games</button>
+            </div>
+          </div>
+        </React.Fragment>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("sw.js").catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
