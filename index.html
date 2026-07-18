@@ -77,6 +77,11 @@
     }
     .lesson-row .lesson-title { font-size: 16px; font-weight: 500; }
     .lesson-row .lesson-count { font-size: 14px; color: var(--text2); }
+    .lesson-row-mixed {
+      background: var(--accent); margin-bottom: 8px;
+    }
+    .lesson-row-mixed .lesson-title, .lesson-row-mixed .lesson-count { color: #ffffff; }
+    .lesson-row-mixed .lesson-title { font-weight: 700; }
 
     .back-link { color: var(--text2); font-size: 14px; background: none; border: none; padding: 4px 0; margin-bottom: 12px; }
     .row-between { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
@@ -184,13 +189,23 @@
       return (
         <div className="lesson-list">
           {lessons.map((lesson) => (
-            <button key={lesson.id} className="lesson-row" onClick={() => onSelect(lesson)}>
+            <button
+              key={lesson.id}
+              className={"lesson-row" + (lesson.mixed ? " lesson-row-mixed" : "")}
+              onClick={() => onSelect(lesson)}>
               <span className="lesson-title">{lesson.title}</span>
               <span className="lesson-count">{lesson.words.length} words</span>
             </button>
           ))}
         </div>
       );
+    }
+
+    function withMixedLesson(lessons, allWords) {
+      return [
+        { id: "all", title: "🔀 All Words Mixed", words: allWords, mixed: true },
+        ...lessons,
+      ];
     }
 
     function FlashcardDeck({ lesson, onExit }) {
@@ -432,7 +447,7 @@
       );
     }
 
-    function LearnScreen({ lessons }) {
+    function LearnScreen({ lessons, allWords }) {
       const [activeLesson, setActiveLesson] = useState(null);
       if (activeLesson) {
         return <FlashcardDeck lesson={activeLesson} onExit={() => setActiveLesson(null)} />;
@@ -441,7 +456,7 @@
         <div>
           <h1 className="page-title">Learn</h1>
           <p className="page-subtitle">Pick a lesson to start flashcards</p>
-          <LessonList lessons={lessons} onSelect={setActiveLesson} />
+          <LessonList lessons={withMixedLesson(lessons, allWords)} onSelect={setActiveLesson} />
         </div>
       );
     }
@@ -477,7 +492,7 @@
         <div>
           <h1 className="page-title">Games</h1>
           <p className="page-subtitle">Pick a lesson to play</p>
-          <LessonList lessons={lessons} onSelect={setLesson} />
+          <LessonList lessons={withMixedLesson(lessons, allWords)} onSelect={setLesson} />
         </div>
       );
     }
@@ -500,7 +515,7 @@
         <React.Fragment>
           <div className="main">
             {tab === "learn" ? (
-              <LearnScreen lessons={vocab.lessons} />
+              <LearnScreen lessons={vocab.lessons} allWords={allWords} />
             ) : (
               <GamesScreen lessons={vocab.lessons} allWords={allWords} />
             )}

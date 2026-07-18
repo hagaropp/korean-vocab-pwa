@@ -1,4 +1,4 @@
-const CACHE = 'korean-vocab-v1';
+const CACHE = 'korean-vocab-v2';
 const CORE = [
   './',
   './index.html',
