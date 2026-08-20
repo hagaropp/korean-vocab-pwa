@@ -326,6 +326,11 @@
           "korean": "아줌마",
           "romanization": "ajumma",
           "english": "middle-aged woman / ma'am"
+        },
+        {
+          "korean": "친구",
+          "romanization": "chingu",
+          "english": "friend"
         }
       ]
     },
@@ -412,6 +417,11 @@
           "korean": "딸",
           "romanization": "ttal",
           "english": "daughter"
+        },
+        {
+          "korean": "쌍둥이",
+          "romanization": "ssangdung-i",
+          "english": "twins"
         }
       ]
     },
@@ -750,6 +760,11 @@
           "korean": "만두",
           "romanization": "mandu",
           "english": "dumpling"
+        },
+        {
+          "korean": "떡",
+          "romanization": "tteok",
+          "english": "(Korean) rice cake"
         }
       ]
     },
@@ -896,6 +911,11 @@
           "korean": "야경",
           "romanization": "yagyeong",
           "english": "night view"
+        },
+        {
+          "korean": "찜질방",
+          "romanization": "jjimjilbang",
+          "english": "Korean sauna"
         }
       ]
     },
@@ -962,6 +982,16 @@
           "korean": "지도",
           "romanization": "jido",
           "english": "map"
+        },
+        {
+          "korean": "주차장",
+          "romanization": "juchajang",
+          "english": "parking lot"
+        },
+        {
+          "korean": "자판기",
+          "romanization": "japangi",
+          "english": "vending machine"
         }
       ]
     },
@@ -1053,6 +1083,16 @@
           "korean": "여드름",
           "romanization": "yeodeureum",
           "english": "acne"
+        },
+        {
+          "korean": "무릎",
+          "romanization": "mureup",
+          "english": "knee"
+        },
+        {
+          "korean": "땀",
+          "romanization": "ttam",
+          "english": "sweat"
         }
       ]
     },
@@ -1205,6 +1245,16 @@
           "korean": "소유",
           "romanization": "soyu",
           "english": "ownership"
+        },
+        {
+          "korean": "값",
+          "romanization": "gap",
+          "english": "price"
+        },
+        {
+          "korean": "공짜",
+          "romanization": "gongjja",
+          "english": "free"
         }
       ]
     },
@@ -1497,6 +1547,11 @@
           "korean": "유명하다",
           "romanization": "yumyeonghada",
           "english": "to be famous"
+        },
+        {
+          "korean": "짜다",
+          "romanization": "jjada",
+          "english": "to be salty"
         }
       ]
     },
@@ -1876,6 +1931,56 @@
           "korean": "약",
           "romanization": "yak",
           "english": "medicine"
+        },
+        {
+          "korean": "베개",
+          "romanization": "begae",
+          "english": "pillow"
+        },
+        {
+          "korean": "냉장고",
+          "romanization": "naengjanggo",
+          "english": "fridge"
+        },
+        {
+          "korean": "선풍기",
+          "romanization": "seonpunggi",
+          "english": "electric fan"
+        },
+        {
+          "korean": "세탁기",
+          "romanization": "setakgi",
+          "english": "washer"
+        },
+        {
+          "korean": "뚜껑",
+          "romanization": "ttukkeong",
+          "english": "cover / lid"
+        },
+        {
+          "korean": "쓰레기통",
+          "romanization": "sseuregitong",
+          "english": "garbage can"
+        },
+        {
+          "korean": "여권",
+          "romanization": "yeogwon",
+          "english": "passport"
+        },
+        {
+          "korean": "단추",
+          "romanization": "danchu",
+          "english": "button"
+        },
+        {
+          "korean": "핸드폰",
+          "romanization": "haendeupon",
+          "english": "mobile phone"
+        },
+        {
+          "korean": "부엌",
+          "romanization": "bueok",
+          "english": "kitchen"
         }
       ]
     },
@@ -1952,6 +2057,11 @@
           "korean": "자유",
           "romanization": "jayu",
           "english": "freedom"
+        },
+        {
+          "korean": "꿈",
+          "romanization": "kkum",
+          "english": "dream"
         }
       ]
     },
@@ -2013,6 +2123,67 @@
           "korean": "별",
           "romanization": "byeol",
           "english": "star"
+        },
+        {
+          "korean": "숲",
+          "romanization": "sup",
+          "english": "forest"
+        },
+        {
+          "korean": "꽃",
+          "romanization": "kkot",
+          "english": "flower"
+        },
+        {
+          "korean": "밖",
+          "romanization": "bakk",
+          "english": "outside"
+        },
+        {
+          "korean": "끝",
+          "romanization": "kkeut",
+          "english": "end"
+        },
+        {
+          "korean": "오른쪽",
+          "romanization": "oreunjjok",
+          "english": "right (direction)"
+        }
+      ]
+    },
+    {
+      "id": "animals",
+      "title": "Animals",
+      "words": [
+        {
+          "korean": "쥐",
+          "romanization": "jwi",
+          "english": "rat / mouse"
+        },
+        {
+          "korean": "돼지",
+          "romanization": "dwaeji",
+          "english": "pig"
+        },
+        {
+          "korean": "토끼",
+          "romanization": "tokki",
+          "english": "rabbit"
+        },
+        {
+          "korean": "닭",
+          "romanization": "dak",
+          "english": "chicken"
+        },
+        {
+          "korean": "벌레",
+          "romanization": "beolle",
+          "english": "bug"
+        },
+        {
+          "korean": "꼬리",
+          "romanization": "kkori",
+          "english": "tail"
         }
       ]
     }
