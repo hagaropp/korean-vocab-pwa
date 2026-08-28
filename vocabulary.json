@@ -1075,6 +1075,26 @@
           "korean": "회",
           "romanization": "hoe",
           "english": "raw fish (sashimi)"
+        },
+        {
+          "korean": "디저트",
+          "romanization": "dijeoteu",
+          "english": "dessert"
+        },
+        {
+          "korean": "쌀",
+          "romanization": "ssal",
+          "english": "rice (uncooked)"
+        },
+        {
+          "korean": "오렌지",
+          "romanization": "orenji",
+          "english": "orange"
+        },
+        {
+          "korean": "피자",
+          "romanization": "pija",
+          "english": "pizza"
         }
       ]
     },
@@ -1684,6 +1704,11 @@
           "korean": "얼음",
           "romanization": "eoreum",
           "english": "ice"
+        },
+        {
+          "korean": "계절",
+          "romanization": "gyejeol",
+          "english": "season"
         }
       ]
     },
@@ -1775,6 +1800,11 @@
           "korean": "공짜",
           "romanization": "gongjja",
           "english": "free"
+        },
+        {
+          "korean": "메뉴",
+          "romanization": "menyu",
+          "english": "menu"
         }
       ]
     },
@@ -1996,6 +2026,21 @@
           "korean": "필요하다",
           "romanization": "pillyohada",
           "english": "to need"
+        },
+        {
+          "korean": "계획하다",
+          "romanization": "gyehoekhada",
+          "english": "to plan"
+        },
+        {
+          "korean": "인사하다",
+          "romanization": "insahada",
+          "english": "to greet"
+        },
+        {
+          "korean": "운전하다",
+          "romanization": "unjeonhada",
+          "english": "to drive"
         }
       ]
     },
@@ -2192,6 +2237,11 @@
           "korean": "아프다",
           "romanization": "apeuda",
           "english": "to be sick / hurt"
+        },
+        {
+          "korean": "멋있다",
+          "romanization": "meositda",
+          "english": "to be cool / stylish"
         }
       ]
     },
@@ -2389,6 +2439,16 @@
           "korean": "화가",
           "romanization": "hwaga",
           "english": "painter"
+        },
+        {
+          "korean": "문장",
+          "romanization": "munjang",
+          "english": "sentence"
+        },
+        {
+          "korean": "수학",
+          "romanization": "suhak",
+          "english": "math"
         }
       ]
     },
@@ -2550,6 +2610,16 @@
           "korean": "북",
           "romanization": "buk",
           "english": "drum"
+        },
+        {
+          "korean": "스도쿠",
+          "romanization": "seudoku",
+          "english": "sudoku"
+        },
+        {
+          "korean": "달리기",
+          "romanization": "dalligi",
+          "english": "running"
         }
       ]
     },
@@ -2866,6 +2936,31 @@
           "korean": "휴지",
           "romanization": "hyuji",
           "english": "tissue"
+        },
+        {
+          "korean": "귀걸이",
+          "romanization": "gwigeori",
+          "english": "earring"
+        },
+        {
+          "korean": "스웨터",
+          "romanization": "seuweteo",
+          "english": "sweater"
+        },
+        {
+          "korean": "팔찌",
+          "romanization": "paljji",
+          "english": "bracelet"
+        },
+        {
+          "korean": "펜",
+          "romanization": "pen",
+          "english": "pen"
+        },
+        {
+          "korean": "마우스",
+          "romanization": "mauseu",
+          "english": "(computer) mouse"
         }
       ]
     },
@@ -3259,6 +3354,11 @@
           "korean": "코끼리",
           "romanization": "kokkiri",
           "english": "elephant"
+        },
+        {
+          "korean": "강아지",
+          "romanization": "gangaji",
+          "english": "puppy"
         }
       ]
     },
@@ -3345,6 +3445,11 @@
           "korean": "그리고",
           "romanization": "geurigo",
           "english": "and"
+        },
+        {
+          "korean": "별로",
+          "romanization": "byeollo",
+          "english": "not really / so-so"
         }
       ]
     }
