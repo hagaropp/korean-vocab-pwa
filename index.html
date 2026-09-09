@@ -149,6 +149,29 @@
     .match-tile.wrong { background: var(--red-tint); }
     .match-tile:disabled { opacity: 1; }
 
+    /* Drive Mode */
+    .option-group { margin-bottom: 16px; }
+    .option-group-label { font-size: 14px; font-weight: 600; color: var(--text2); margin-bottom: 8px; }
+    .option-btn {
+      display: block; width: 100%; background: var(--bg-elevated); border: 2px solid transparent;
+      border-radius: 16px; padding: 14px 16px; text-align: left; font-size: 16px; margin-bottom: 8px;
+    }
+    .option-btn.selected { border-color: var(--accent); background: var(--bg-selected); font-weight: 600; }
+
+    .drive-screen { display: flex; flex-direction: column; align-items: center; min-height: 55vh; justify-content: center; gap: 20px; }
+    .drive-phase { font-size: 13px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.6px; }
+    .drive-word { font-size: 52px; font-weight: 800; text-align: center; word-break: break-word; }
+    .drive-sub { font-size: 18px; color: var(--text2); text-align: center; }
+    .drive-controls { display: flex; align-items: center; justify-content: center; gap: 20px; margin-top: 12px; }
+    .drive-play-btn {
+      width: 84px; height: 84px; border-radius: 50%; background: var(--accent); color: #fff;
+      border: none; font-size: 30px; display: flex; align-items: center; justify-content: center;
+    }
+    .drive-skip-btn {
+      width: 60px; height: 60px; border-radius: 50%; background: var(--bg-elevated); color: var(--text);
+      border: none; font-size: 22px; display: flex; align-items: center; justify-content: center;
+    }
+
     /* Tab bar */
     .tab-bar-wrap {
       position: fixed; left: 0; right: 0; bottom: 0;
@@ -175,6 +198,23 @@
 
   <script type="text/babel">
     const { useState, useEffect, useMemo } = React;
+
+    function speak(text, lang, rate) {
+      return new Promise((resolve) => {
+        if (!("speechSynthesis" in window)) { resolve(); return; }
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = lang;
+        utter.rate = rate || 0.9;
+        utter.onend = resolve;
+        utter.onerror = resolve;
+        window.speechSynthesis.speak(utter);
+      });
+    }
+
+    function wait(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
 
     function shuffle(items) {
       const result = [...items];
@@ -447,6 +487,194 @@
       );
     }
 
+    const PACE_OPTIONS = [
+      { id: "short", label: "Quick (2s to answer)", ms: 2000 },
+      { id: "normal", label: "Normal (3.5s to answer)", ms: 3500 },
+      { id: "long", label: "Relaxed (5s to answer)", ms: 5000 },
+    ];
+
+    const DIRECTION_OPTIONS = [
+      { id: "ko-en", label: "Korean → English" },
+      { id: "en-ko", label: "English → Korean" },
+      { id: "mixed", label: "Mixed (both directions)" },
+    ];
+
+    function DriveConfig({ lesson, onStart, onExit }) {
+      const [direction, setDirection] = useState("ko-en");
+      const [pace, setPace] = useState("normal");
+
+      function start() {
+        // Prime iOS speech synthesis with a near-silent utterance inside this
+        // click handler, since it must run within a genuine user gesture.
+        if ("speechSynthesis" in window) {
+          const unlock = new SpeechSynthesisUtterance(" ");
+          unlock.volume = 0.01;
+          window.speechSynthesis.speak(unlock);
+        }
+        onStart({ direction, pace });
+      }
+
+      return (
+        <div>
+          <button className="back-link" onClick={onExit}>‹ Games</button>
+          <h1 className="page-title">{lesson.title}</h1>
+          <p className="page-subtitle">Set up Drive Mode — hands-free audio practice</p>
+
+          <div className="option-group">
+            <div className="option-group-label">Direction</div>
+            {DIRECTION_OPTIONS.map((opt) => (
+              <button
+                key={opt.id}
+                className={"option-btn" + (direction === opt.id ? " selected" : "")}
+                onClick={() => setDirection(opt.id)}>
+                {opt.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="option-group">
+            <div className="option-group-label">Pace</div>
+            {PACE_OPTIONS.map((opt) => (
+              <button
+                key={opt.id}
+                className={"option-btn" + (pace === opt.id ? " selected" : "")}
+                onClick={() => setPace(opt.id)}>
+                {opt.label}
+              </button>
+            ))}
+          </div>
+
+          <button className="btn btn-dark btn-block" onClick={start}>Start Drive Mode</button>
+        </div>
+      );
+    }
+
+    function DriveMode({ lesson, direction, pace, onExit }) {
+      const [order, setOrder] = useState(() => shuffle(lesson.words.map((_, i) => i)));
+      const [index, setIndex] = useState(0);
+      const [isPlaying, setIsPlaying] = useState(true);
+      const [phase, setPhase] = useState("prompt");
+      const [currentDirection, setCurrentDirection] = useState(
+        direction === "mixed" ? "ko-en" : direction
+      );
+      const runIdRef = React.useRef(0);
+      const wakeLockRef = React.useRef(null);
+
+      const paceMs = (PACE_OPTIONS.find((p) => p.id === pace) || PACE_OPTIONS[1]).ms;
+
+      // Keep the screen awake for the whole session so playback doesn't stall.
+      useEffect(() => {
+        async function acquireWakeLock() {
+          try {
+            if ("wakeLock" in navigator) {
+              wakeLockRef.current = await navigator.wakeLock.request("screen");
+            }
+          } catch (e) {}
+        }
+        acquireWakeLock();
+        function onVisibility() {
+          if (document.visibilityState === "visible") acquireWakeLock();
+        }
+        document.addEventListener("visibilitychange", onVisibility);
+        return () => {
+          document.removeEventListener("visibilitychange", onVisibility);
+          if (wakeLockRef.current) wakeLockRef.current.release().catch(() => {});
+        };
+      }, []);
+
+      useEffect(() => {
+        if (!isPlaying) {
+          if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+          return;
+        }
+
+        if (index >= order.length) {
+          setOrder(shuffle(lesson.words.map((_, i) => i)));
+          setIndex(0);
+          return;
+        }
+
+        const myRun = ++runIdRef.current;
+        const word = lesson.words[order[index]];
+        const dir = direction === "mixed" ? (Math.random() < 0.5 ? "ko-en" : "en-ko") : direction;
+        setCurrentDirection(dir);
+
+        const promptText = dir === "ko-en" ? word.korean : word.english;
+        const promptLang = dir === "ko-en" ? "ko-KR" : "en-US";
+        const answerText = dir === "ko-en" ? word.english : word.korean;
+        const answerLang = dir === "ko-en" ? "en-US" : "ko-KR";
+        const koRate = 0.85;
+        const enRate = 0.95;
+
+        async function run() {
+          setPhase("prompt");
+          await speak(promptText, promptLang, promptLang === "ko-KR" ? koRate : enRate);
+          if (runIdRef.current !== myRun) return;
+          setPhase("pause");
+          await wait(paceMs);
+          if (runIdRef.current !== myRun) return;
+          setPhase("answer");
+          await speak(answerText, answerLang, answerLang === "ko-KR" ? koRate : enRate);
+          if (runIdRef.current !== myRun) return;
+          await wait(700);
+          if (runIdRef.current !== myRun) return;
+          setIndex((i) => i + 1);
+        }
+        run();
+
+        return () => {
+          runIdRef.current++;
+          if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+        };
+      }, [isPlaying, index, order, direction, paceMs]);
+
+      const currentWord = index < order.length ? lesson.words[order[index]] : null;
+      const showingKorean = currentDirection === "ko-en" ? phase !== "answer" : phase === "answer";
+
+      return (
+        <div>
+          <div className="row-between">
+            <button className="back-link" onClick={onExit}>‹ Exit Drive Mode</button>
+            <span className="progress-label">{lesson.title}</span>
+          </div>
+
+          <div className="drive-screen">
+            <div className="drive-phase">
+              {phase === "prompt" && "🔊 Listen"}
+              {phase === "pause" && "🎤 Your turn"}
+              {phase === "answer" && "✅ Answer"}
+            </div>
+            {currentWord && (
+              <React.Fragment>
+                <div className="drive-word">
+                  {currentDirection === "ko-en"
+                    ? (phase === "answer" ? currentWord.english : currentWord.korean)
+                    : (phase === "answer" ? currentWord.korean : currentWord.english)}
+                </div>
+                {showingKorean && (
+                  <div className="drive-sub">{currentWord.romanization}</div>
+                )}
+              </React.Fragment>
+            )}
+            <div className="drive-controls">
+              <button
+                className="drive-skip-btn"
+                onClick={() => setIndex((i) => i + 1)}
+                aria-label="Skip">
+                ⏭
+              </button>
+              <button
+                className="drive-play-btn"
+                onClick={() => setIsPlaying((p) => !p)}
+                aria-label={isPlaying ? "Pause" : "Play"}>
+                {isPlaying ? "⏸" : "▶"}
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     function LearnScreen({ lessons, allWords }) {
       const [activeLesson, setActiveLesson] = useState(null);
       if (activeLesson) {
@@ -464,12 +692,31 @@
     function GamesScreen({ lessons, allWords }) {
       const [lesson, setLesson] = useState(null);
       const [gameType, setGameType] = useState(null);
+      const [driveSettings, setDriveSettings] = useState(null);
+
+      function resetGame() {
+        setGameType(null);
+        setDriveSettings(null);
+      }
 
       if (lesson && gameType === "quiz") {
-        return <QuizGame lesson={lesson} allWords={allWords} onExit={() => setGameType(null)} />;
+        return <QuizGame lesson={lesson} allWords={allWords} onExit={resetGame} />;
       }
       if (lesson && gameType === "match") {
-        return <MatchGame lesson={lesson} onExit={() => setGameType(null)} />;
+        return <MatchGame lesson={lesson} onExit={resetGame} />;
+      }
+      if (lesson && gameType === "drive" && !driveSettings) {
+        return <DriveConfig lesson={lesson} onStart={setDriveSettings} onExit={resetGame} />;
+      }
+      if (lesson && gameType === "drive" && driveSettings) {
+        return (
+          <DriveMode
+            lesson={lesson}
+            direction={driveSettings.direction}
+            pace={driveSettings.pace}
+            onExit={resetGame}
+          />
+        );
       }
       if (lesson) {
         return (
@@ -484,6 +731,10 @@
             <button className="game-card" onClick={() => setGameType("match")}>
               <div className="game-card-title">Match</div>
               <div className="game-card-sub">Tap pairs of Korean and English</div>
+            </button>
+            <button className="game-card" onClick={() => setGameType("drive")}>
+              <div className="game-card-title">🚗 Drive Mode</div>
+              <div className="game-card-sub">Hands-free audio practice — listen and say it out loud</div>
             </button>
           </div>
         );
