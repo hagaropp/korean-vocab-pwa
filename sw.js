@@ -1,9 +1,10 @@
-const CACHE = 'korean-vocab-v6';
+const CACHE = 'korean-vocab-v7';
 const CORE = [
   './',
   './index.html',
   './manifest.json',
   './vocabulary.json',
+  './pronunciation.json',
   './icon-180.png',
   './icon-192.png',
   './icon-512.png',

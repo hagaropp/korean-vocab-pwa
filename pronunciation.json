@@ -1,0 +1,117 @@
+{
+  "rules": [
+    {
+      "id": "consonant-position",
+      "title": "Consonants Change with Position",
+      "explanation": "ㄱ, ㄷ, ㅂ, and ㅈ sound close to a soft English k, t, p, and ch at the start of a word. Once they land between two vowels, the vocal cords start vibrating earlier and they soften toward g, d, b, and j instead. It's the same letter — position just changes how hard or soft it lands.",
+      "examples": [
+        { "hangul": "바나나", "pronunciation": "banana", "note": "the first ㅂ starts the word (softer p); the one after a vowel softens toward b" },
+        { "hangul": "아버지", "pronunciation": "abeoji", "note": "father — ㅂ between vowels sounds close to b" },
+        { "hangul": "고기", "pronunciation": "gogi", "note": "meat — the second ㄱ, between vowels, softens toward g" }
+      ]
+    },
+    {
+      "id": "sh-before-i",
+      "title": "ㅅ Becomes \"sh\" Before 이 or a Y-Vowel",
+      "explanation": "ㅅ is normally a plain s sound, but right before the vowel ㅣ or a y-glide vowel (야, 여, 요, 유), it shifts to an sh sound instead.",
+      "examples": [
+        { "hangul": "시간", "pronunciation": "shigan", "note": "time — ㅅ + 이 → shi" },
+        { "hangul": "샤워", "pronunciation": "shawo", "note": "shower — ㅅ + 야 → sha" }
+      ]
+    },
+    {
+      "id": "seven-batchim-sounds",
+      "title": "Final Consonants Collapse to 7 Sounds",
+      "explanation": "Korean can end a syllable with many different consonant letters, but when spoken they all collapse into just seven sounds: [k], [n], [t], [l], [m], [p], and [ng]. Several letters share an ending sound — ㄷ, ㅅ, ㅈ, ㅊ, ㅌ, and ㅎ are all pronounced [t] at the end of a syllable.",
+      "examples": [
+        { "hangul": "옷", "pronunciation": "[옫]", "note": "clothes — ㅅ batchim sounds like [t]" },
+        { "hangul": "낮", "pronunciation": "[낟]", "note": "daytime — ㅈ batchim sounds like [t]" },
+        { "hangul": "밖", "pronunciation": "[박]", "note": "outside — ㄲ batchim sounds like [k]" }
+      ]
+    },
+    {
+      "id": "h-batchim-silent",
+      "title": "A Final ㅎ Disappears Before a Vowel",
+      "explanation": "When a syllable ending in ㅎ is followed by a syllable that starts with a vowel, the ㅎ isn't pronounced at all — the two syllables just blend together.",
+      "examples": [
+        { "hangul": "좋아요", "pronunciation": "[조아요]", "note": "good / like it" },
+        { "hangul": "놓아요", "pronunciation": "[노아요]", "note": "put down" },
+        { "hangul": "넣어요", "pronunciation": "[너어요]", "note": "put in" }
+      ]
+    },
+    {
+      "id": "linking-sound",
+      "title": "A Final Consonant Slides Into the Next Syllable",
+      "explanation": "When a syllable's final consonant is followed by a syllable starting with the silent placeholder ㅇ, that consonant's sound slides over and becomes the start of the next syllable. The spelling doesn't change — only how it's spoken.",
+      "examples": [
+        { "hangul": "음식이", "pronunciation": "[음시기]", "note": "food (+ subject marker) — the ㄱ of 식 slides onto 이" },
+        { "hangul": "한국어", "pronunciation": "[한구거]", "note": "the Korean language — the ㄱ of 국 slides onto 어" }
+      ]
+    },
+    {
+      "id": "nasalization",
+      "title": "ㅂ/ㄷ/ㄱ Soften Before ㅁ or ㄴ",
+      "explanation": "When a syllable ending in a ㅂ-type, ㄷ-type, or ㄱ-type sound is immediately followed by a syllable starting with ㅁ or ㄴ, that final sound turns nasal — ㅂ becomes ㅁ, ㄷ becomes ㄴ, and ㄱ becomes ㅇ.",
+      "examples": [
+        { "hangul": "한국말", "pronunciation": "[한궁말]", "note": "the Korean language — ㄱ before ㅁ becomes [ㅇ]" },
+        { "hangul": "입니다", "pronunciation": "[임니다]", "note": "is / am / are (formal) — ㅂ before ㄴ becomes [ㅁ]" }
+      ]
+    },
+    {
+      "id": "h-aspiration",
+      "title": "ㅎ Fuses With a Neighbor Into an Aspirated Sound",
+      "explanation": "ㅎ tends to disappear into whichever plain consonant sits next to it, fusing with ㄱ, ㄷ, ㅂ, or ㅈ to produce the matching aspirated (extra-breathy) sound: ㅋ, ㅌ, ㅍ, or ㅊ.",
+      "examples": [
+        { "hangul": "축하", "pronunciation": "[추카]", "note": "congratulations — ㄱ + ㅎ → 카" },
+        { "hangul": "좋다", "pronunciation": "[조타]", "note": "to be good — ㅎ + ㄷ → 타" },
+        { "hangul": "많다", "pronunciation": "[만타]", "note": "to be many — ㅎ + ㄷ → 타" }
+      ]
+    },
+    {
+      "id": "aspirated-consonants",
+      "title": "Aspirated Consonants: ㅋ ㅌ ㅍ ㅊ",
+      "explanation": "These four are the \"breathy\" partners of ㄱ, ㄷ, ㅂ, and ㅈ — said with a noticeably stronger puff of air, closer to how English says k, t, p, and ch at the start of a stressed word.",
+      "examples": [
+        { "hangul": "커피", "pronunciation": "keopi", "note": "coffee" },
+        { "hangul": "친구", "pronunciation": "chingu", "note": "friend" }
+      ]
+    },
+    {
+      "id": "tensed-consonants",
+      "title": "Tensed Consonants: ㄲ ㄸ ㅃ ㅆ ㅉ",
+      "explanation": "These five are pronounced with the throat tightened and almost no puff of air released — a harder, more clipped version of ㄱ, ㄷ, ㅂ, ㅅ, and ㅈ. A quick self-check: hold a thin strip of paper in front of your mouth — it should barely move for a tensed consonant, versus a lot for an aspirated one.",
+      "examples": [
+        { "hangul": "싸요", "pronunciation": "ssayo", "note": "it's cheap" },
+        { "hangul": "빵", "pronunciation": "ppang", "note": "bread" }
+      ]
+    },
+    {
+      "id": "tensification",
+      "title": "Some Plain Consonants Get Tensed Automatically",
+      "explanation": "When ㄱ, ㄷ, ㅂ, ㅅ, or ㅈ starts a syllable right after certain final consonants, it automatically hardens into its tensed version — even though the spelling stays plain.",
+      "examples": [
+        { "hangul": "학교", "pronunciation": "[학꾜]", "note": "school" },
+        { "hangul": "축구", "pronunciation": "[축꾸]", "note": "soccer" }
+      ]
+    },
+    {
+      "id": "w-glide-vowels",
+      "title": "The Six \"W-Glide\" Compound Vowels",
+      "explanation": "와, 워, 왜, 웨, 외, and 위 are all built the same way: start with your lips rounded as if to say ㅗ or ㅜ, then glide quickly into the second vowel. 외 ends up sounding just like 웨.",
+      "examples": [
+        { "hangul": "과일", "pronunciation": "gwail", "note": "fruit" },
+        { "hangul": "권투", "pronunciation": "gwontu", "note": "boxing" }
+      ]
+    },
+    {
+      "id": "ui-vowel",
+      "title": "ㅢ Changes Depending on Where It Falls",
+      "explanation": "ㅢ keeps its full sound only when it's the very first syllable of a word. As a later syllable it's easiest to say as [이], and if a consonant is written in front of it, it's pronounced simply as [이] too.",
+      "examples": [
+        { "hangul": "의사", "pronunciation": "uisa", "note": "doctor — first syllable, keeps its full sound" },
+        { "hangul": "회의", "pronunciation": "[회이]", "note": "meeting — second syllable, simplifies to [이]" },
+        { "hangul": "무늬", "pronunciation": "[무니]", "note": "pattern — consonant + ㅢ, simplifies to [이]" }
+      ]
+    }
+  ]
+}

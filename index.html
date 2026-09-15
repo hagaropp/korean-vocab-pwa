@@ -172,6 +172,26 @@
       border: none; font-size: 22px; display: flex; align-items: center; justify-content: center;
     }
 
+    /* Pronunciation */
+    .rule-detail { display: flex; flex-direction: column; gap: 16px; }
+    .rule-explanation { font-size: 15px; line-height: 1.5; }
+    .example-row {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--bg-elevated); border-radius: 16px; padding: 14px 16px;
+    }
+    .example-main { flex: 1; }
+    .example-hangul { font-size: 22px; font-weight: 700; }
+    .example-pron { font-size: 14px; color: var(--accent); font-weight: 600; }
+    .example-note { font-size: 13px; color: var(--text2); margin-top: 2px; }
+    .listen-btn {
+      width: 40px; height: 40px; border-radius: 20px; background: var(--bg-selected);
+      border: none; font-size: 16px; flex-shrink: 0;
+    }
+    .pron-quiz-prompt {
+      background: var(--bg-elevated); border-radius: 24px; padding: 32px 20px;
+      display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 16px;
+    }
+
     /* Tab bar */
     .tab-bar-wrap {
       position: fixed; left: 0; right: 0; bottom: 0;
@@ -675,6 +695,165 @@
       );
     }
 
+    function buildPronunciationQuestions(rules) {
+      const allExamples = rules.flatMap((r) => r.examples);
+      return shuffle(allExamples).map((ex) => {
+        const distractors = shuffle(
+          allExamples.filter((o) => o.pronunciation !== ex.pronunciation)
+        ).slice(0, 3);
+        const options = shuffle([ex, ...distractors]);
+        return { example: ex, options };
+      });
+    }
+
+    function PronunciationQuiz({ rules, onExit }) {
+      const [questions, setQuestions] = useState(() => buildPronunciationQuestions(rules));
+      const [index, setIndex] = useState(0);
+      const [score, setScore] = useState(0);
+      const [picked, setPicked] = useState(null);
+
+      const isDone = index >= questions.length;
+      const current = !isDone ? questions[index] : null;
+
+      function choose(option) {
+        if (picked) return;
+        setPicked(option.pronunciation);
+        if (option.pronunciation === current.example.pronunciation) setScore((s) => s + 1);
+      }
+
+      function next() {
+        setPicked(null);
+        setIndex((i) => i + 1);
+      }
+
+      function restart() {
+        setQuestions(buildPronunciationQuestions(rules));
+        setIndex(0);
+        setScore(0);
+        setPicked(null);
+      }
+
+      if (isDone) {
+        return (
+          <div>
+            <div className="center-text">
+              <div className="result-title">Nice work!</div>
+              <div className="result-body">You scored {score} / {questions.length} on pronunciation.</div>
+            </div>
+            <button className="btn btn-dark btn-block" onClick={restart}>Play again</button>
+            <button className="result-back" onClick={onExit}>Back to rules</button>
+          </div>
+        );
+      }
+
+      return (
+        <div>
+          <div className="row-between">
+            <button className="back-link" onClick={onExit}>‹ Rules</button>
+            <span className="progress-label">{index + 1} / {questions.length}</span>
+          </div>
+
+          <div className="pron-quiz-prompt">
+            <div className="card-korean">{current.example.hangul}</div>
+            <button
+              className="listen-btn"
+              onClick={() => speak(current.example.hangul, "ko-KR", 0.8)}
+              aria-label="Listen">
+              🔊
+            </button>
+          </div>
+          <p className="page-subtitle" style={{ textAlign: "center" }}>How is this pronounced?</p>
+
+          <div className="quiz-options">
+            {current.options.map((option) => {
+              const isCorrect = option.pronunciation === current.example.pronunciation;
+              const isPicked = picked === option.pronunciation;
+              const showResult = picked !== null;
+              let cls = "quiz-option";
+              if (showResult && isCorrect) cls += " correct";
+              else if (showResult && isPicked) cls += " wrong";
+              return (
+                <button
+                  key={option.pronunciation}
+                  className={cls}
+                  disabled={showResult}
+                  onClick={() => choose(option)}>
+                  {option.pronunciation}
+                </button>
+              );
+            })}
+          </div>
+
+          {picked && <button className="btn btn-dark btn-block" onClick={next}>Next</button>}
+        </div>
+      );
+    }
+
+    function PronunciationRuleDetail({ rule, onExit, onPractice }) {
+      return (
+        <div>
+          <button className="back-link" onClick={onExit}>‹ Rules</button>
+          <h1 className="page-title">{rule.title}</h1>
+          <div className="rule-detail">
+            <p className="rule-explanation">{rule.explanation}</p>
+            {rule.examples.map((ex) => (
+              <div className="example-row" key={ex.hangul}>
+                <div className="example-main">
+                  <div className="example-hangul">{ex.hangul}</div>
+                  <div className="example-pron">{ex.pronunciation}</div>
+                  <div className="example-note">{ex.note}</div>
+                </div>
+                <button
+                  className="listen-btn"
+                  onClick={() => speak(ex.hangul, "ko-KR", 0.8)}
+                  aria-label="Listen">
+                  🔊
+                </button>
+              </div>
+            ))}
+            <button className="btn btn-dark btn-block" onClick={onPractice}>Practice this rule</button>
+          </div>
+        </div>
+      );
+    }
+
+    function PronunciationScreen({ rules }) {
+      const [activeRule, setActiveRule] = useState(null);
+      const [practicing, setPracticing] = useState(false);
+
+      if (practicing) {
+        const ruleSet = activeRule ? [activeRule] : rules;
+        return <PronunciationQuiz rules={ruleSet} onExit={() => setPracticing(false)} />;
+      }
+      if (activeRule) {
+        return (
+          <PronunciationRuleDetail
+            rule={activeRule}
+            onExit={() => setActiveRule(null)}
+            onPractice={() => setPracticing(true)}
+          />
+        );
+      }
+      return (
+        <div>
+          <h1 className="page-title">Pronunciation</h1>
+          <p className="page-subtitle">Learn the rules, then practice by ear</p>
+          <button className="game-card" onClick={() => setPracticing(true)} nativeID="pron-quiz-all">
+            <div className="game-card-title">🔊 Practice All Rules</div>
+            <div className="game-card-sub">Mixed quiz across every rule below</div>
+          </button>
+          <div className="lesson-list" style={{ marginTop: 16 }}>
+            {rules.map((rule) => (
+              <button key={rule.id} className="lesson-row" onClick={() => setActiveRule(rule)}>
+                <span className="lesson-title">{rule.title}</span>
+                <span className="lesson-count">{rule.examples.length} ex.</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
     function LearnScreen({ lessons, allWords }) {
       const [activeLesson, setActiveLesson] = useState(null);
       if (activeLesson) {
@@ -750,32 +929,33 @@
 
     function App() {
       const [vocab, setVocab] = useState(null);
+      const [pronunciation, setPronunciation] = useState(null);
       const [tab, setTab] = useState("learn");
 
       useEffect(() => {
         fetch("vocabulary.json").then((r) => r.json()).then(setVocab);
+        fetch("pronunciation.json").then((r) => r.json()).then(setPronunciation);
       }, []);
 
       const allWords = useMemo(() => (vocab ? vocab.lessons.flatMap((l) => l.words) : []), [vocab]);
 
-      if (!vocab) {
+      if (!vocab || !pronunciation) {
         return <div className="loading">Loading…</div>;
       }
 
       return (
         <React.Fragment>
           <div className="main">
-            {tab === "learn" ? (
-              <LearnScreen lessons={vocab.lessons} allWords={allWords} />
-            ) : (
-              <GamesScreen lessons={vocab.lessons} allWords={allWords} />
-            )}
+            {tab === "learn" && <LearnScreen lessons={vocab.lessons} allWords={allWords} />}
+            {tab === "games" && <GamesScreen lessons={vocab.lessons} allWords={allWords} />}
+            {tab === "pronunciation" && <PronunciationScreen rules={pronunciation.rules} />}
           </div>
           <div className="tab-bar-wrap">
             <div className="tab-bar">
               <span className="tab-brand">한국어 Vocab</span>
               <button className={"tab-btn" + (tab === "learn" ? " active" : "")} onClick={() => setTab("learn")}>Learn</button>
               <button className={"tab-btn" + (tab === "games" ? " active" : "")} onClick={() => setTab("games")}>Games</button>
+              <button className={"tab-btn" + (tab === "pronunciation" ? " active" : "")} onClick={() => setTab("pronunciation")}>Sounds</button>
             </div>
           </div>
         </React.Fragment>
