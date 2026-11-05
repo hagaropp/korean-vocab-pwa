@@ -937,7 +937,16 @@
         fetch("pronunciation.json").then((r) => r.json()).then(setPronunciation);
       }, []);
 
-      const allWords = useMemo(() => (vocab ? vocab.lessons.flatMap((l) => l.words) : []), [vocab]);
+      const allWords = useMemo(() => {
+        if (!vocab) return [];
+        const seen = new Set();
+        return vocab.lessons.flatMap((l) => l.words).filter((w) => {
+          const key = w.korean + "|" + w.english;
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
+      }, [vocab]);
 
       if (!vocab || !pronunciation) {
         return <div className="loading">Loading…</div>;
